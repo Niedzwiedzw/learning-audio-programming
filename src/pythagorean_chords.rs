@@ -51,14 +51,12 @@ mod pythagorean {
     ];
 
     pub fn notes() -> Vec<f32> {
-        OFFSETS.iter().map(|offset| A4 * offset).collect()
+        OFFSETS.iter().map(|offset| A4 * 0.5f32.powi(3) * offset).collect()
     }
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut song_chords: Vec<Vec<f32>> = vec![
-
-    ];
+    let mut song_chords: Vec<Vec<f32>> = vec![];
 
     let mut notes = pythagorean::notes();
     notes.append(
@@ -66,8 +64,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
             .iter()
             .map(|v| v * 2.0)
             .chain(notes.iter().map(|v| v * 4.0))
-
             .chain(notes.iter().map(|v| v * 8.0))
+            .chain(notes.iter().map(|v| v * 16.0))
             .collect(),
     );
     let scale = vec![
@@ -92,7 +90,6 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         notes[2 * 12 + 7],
         notes[2 * 12 + 9],
         notes[2 * 12 + 11],
-
         notes[3 * 12 + 0],
         notes[3 * 12 + 2],
         notes[3 * 12 + 4],
@@ -100,6 +97,13 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         notes[3 * 12 + 7],
         notes[3 * 12 + 9],
         notes[3 * 12 + 11],
+        notes[4 * 12 + 0],
+        notes[4 * 12 + 2],
+        notes[4 * 12 + 4],
+        notes[4 * 12 + 5],
+        notes[4 * 12 + 7],
+        notes[4 * 12 + 9],
+        notes[4 * 12 + 11],
     ];
 
     #[rustfmt::skip]
@@ -170,7 +174,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     song_chords.append(
         &mut barka
             .into_iter()
-            .map(|v| vec![scale[v], scale[v + 2]])
+            .map(|v| vec![scale[v], scale[v + 2], scale[v + 4], scale[v + 7], scale[v + 9], scale[v + 14]])
             .collect(),
     );
 
@@ -179,8 +183,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         Box::new(std::iter::empty::<f32>()) as _,
         |song: Box<dyn Iterator<Item = f32>>, chunk| {
             Box::new(
-                song.chain(chunk.take(note_length as usize))
-                    .chain(std::iter::repeat(0.0f32).take((note_length * 0.1) as usize)),
+                song.chain(chunk.take(note_length as usize)),
             )
             // 2 seconds of each chord
         },
