@@ -112,6 +112,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         7, 7, 7,
         7, 7, 7,
         8, 8, 9,
+
         10, 10, 10,
         10, 10, 10,
         10, 10, 10,
@@ -120,6 +121,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         8, 8, 8,
         8, 8, 4,
         7, 7, 8,
+
         9, 9, 9,
         9, 9, 9,
         9, 9, 9,
@@ -127,8 +129,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         7, 7, 7,
         7, 7, 7,
         7, 7, 7,
-
         7, 7, 7,
+
         12, 12, 12,
         12, 12, 12,
         12, 12, 13,
@@ -137,6 +139,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         11, 11, 11,
         11, 11, 11,
         10, 10, 9,
+
         10, 10, 10,
         10, 10, 10,
         10, 10, 11,
@@ -144,8 +147,8 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         9, 9, 9,
         9, 9, 9,
         9, 9, 9,
-
         7, 7, 7,
+
         12, 12, 12,
         12, 12, 12,
         12, 12, 13,
@@ -154,6 +157,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         9, 9, 9,
         9, 9, 9,
         10, 10, 9,
+
         10, 10, 10,
         10, 10, 10,
         10, 8, 9,
@@ -161,7 +165,7 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
         7, 7, 7,
         7, 7, 7,
         7, 7, 7,
-
+        7, 7, 7,
     ];
     song_chords.append(
         &mut barka
