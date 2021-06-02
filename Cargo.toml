@@ -8,3 +8,4 @@ edition = "2018"
 [dependencies]
 hound = "3.4.0"
 itertools = "0.10.0"
+ringbuf = "0.2.5"

@@ -51,153 +51,170 @@ mod pythagorean {
     ];
 
     pub fn notes() -> Vec<f32> {
-        OFFSETS.iter().map(|offset| A4 * 0.5f32.powi(3) * offset).collect()
+        OFFSETS.iter().map(|offset| A4 * 0.5 * offset).collect()
+    }
+}
+
+mod equal_temperament {
+    use super::A4;
+    const OFFSETS: [f32; 12] = [
+        1.0, 1.059463, 1.122462, 1.189207, 1.259921, 1.33484, 1.414214, 1.498307, 1.587401,
+        1.681793, 1.781797, 1.887749,
+    ];
+
+    pub fn notes() -> Vec<f32> {
+        OFFSETS.iter().map(|offset| A4 * 0.5 * offset).collect()
     }
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut song_chords: Vec<Vec<f32>> = vec![];
+    fn make_barka(notes: Vec<f32>) -> Vec<i16> {
+        #[rustfmt::skip]
+        let barka = vec![
+            9, 9, 9, // pan
+            9, 9, 9,
+            9, 8, 9, // kiedyś
+            10, 9, 8, // stanął nad
+            7, 7, 7, // brze-e-giem
+            7, 7, 7,
+            7, 7, 7,
+            8, 8, 9,
+            
+            10, 10, 10,
+            10, 10, 10,
+            10, 10, 10,
+            10, 10, 9,
+            8, 8, 8,
+            8, 8, 8,
+            8, 8, 4,
+            7, 7, 8,
+            
+            9, 9, 9,
+            9, 9, 9,
+            9, 9, 9,
+            10, 10, 8,
+            7, 7, 7,
+            7, 7, 7,
+            7, 7, 7,
+            7, 7, 7,
+            
+            12, 12, 12,
+            12, 12, 12,
+            12, 12, 13,
+            14, 13, 12,
+            11, 11, 11,
+            11, 11, 11,
+            11, 11, 11,
+            10, 10, 9,
+            
+            10, 10, 10,
+            10, 10, 10,
+            10, 10, 11,
+            12, 11, 10,
+            9, 9, 9,
+            9, 9, 9,
+            9, 9, 9,
+            7, 7, 7,
+            
+            12, 12, 12,
+            12, 12, 12,
+            12, 12, 13,
+            14, 13, 12,
+            11, 11, 11,
+            9, 9, 9,
+            9, 9, 9,
+            10, 10, 9,
+            
+            10, 10, 10,
+            10, 10, 10,
+            10, 8, 9,
+            10, 9, 8,
+            7, 7, 7,
+            7, 7, 7,
+            7, 7, 7,
+            7, 7, 7,
+        ];
 
-    let mut notes = pythagorean::notes();
-    notes.append(
-        &mut notes
-            .iter()
-            .map(|v| v * 2.0)
-            .chain(notes.iter().map(|v| v * 4.0))
-            .chain(notes.iter().map(|v| v * 8.0))
-            .chain(notes.iter().map(|v| v * 16.0))
-            .collect(),
-    );
-    let scale = vec![
-        notes[0],
-        notes[2],
-        notes[4],
-        notes[5],
-        notes[7],
-        notes[9],
-        notes[11],
-        notes[12 + 0],
-        notes[12 + 2],
-        notes[12 + 4],
-        notes[12 + 5],
-        notes[12 + 7],
-        notes[12 + 9],
-        notes[12 + 11],
-        notes[2 * 12 + 0],
-        notes[2 * 12 + 2],
-        notes[2 * 12 + 4],
-        notes[2 * 12 + 5],
-        notes[2 * 12 + 7],
-        notes[2 * 12 + 9],
-        notes[2 * 12 + 11],
-        notes[3 * 12 + 0],
-        notes[3 * 12 + 2],
-        notes[3 * 12 + 4],
-        notes[3 * 12 + 5],
-        notes[3 * 12 + 7],
-        notes[3 * 12 + 9],
-        notes[3 * 12 + 11],
-        notes[4 * 12 + 0],
-        notes[4 * 12 + 2],
-        notes[4 * 12 + 4],
-        notes[4 * 12 + 5],
-        notes[4 * 12 + 7],
-        notes[4 * 12 + 9],
-        notes[4 * 12 + 11],
-    ];
+        let mut song_chords: Vec<Vec<f32>> = vec![];
+        let mut notes = notes.clone();
+        notes.append(
+            &mut notes
+                .iter()
+                .map(|v| v * 2.0)
+                .chain(notes.iter().map(|v| v * 4.0))
+                .chain(notes.iter().map(|v| v * 8.0))
+                .chain(notes.iter().map(|v| v * 16.0))
+                .collect(),
+        );
 
-    #[rustfmt::skip]
-    let barka = vec![
-        9, 9, 9, // pan
-        9, 9, 9,
-        9, 8, 9, // kiedyś
-        10, 9, 8, // stanął nad
-        7, 7, 7, // brze-e-giem
-        7, 7, 7,
-        7, 7, 7,
-        8, 8, 9,
+        let scale = vec![
+            notes[0],
+            notes[2],
+            notes[4],
+            notes[5],
+            notes[7],
+            notes[9],
+            notes[11],
+            notes[12 + 0],
+            notes[12 + 2],
+            notes[12 + 4],
+            notes[12 + 5],
+            notes[12 + 7],
+            notes[12 + 9],
+            notes[12 + 11],
+            notes[2 * 12 + 0],
+            notes[2 * 12 + 2],
+            notes[2 * 12 + 4],
+            notes[2 * 12 + 5],
+            notes[2 * 12 + 7],
+            notes[2 * 12 + 9],
+            notes[2 * 12 + 11],
+            notes[3 * 12 + 0],
+            notes[3 * 12 + 2],
+            notes[3 * 12 + 4],
+            notes[3 * 12 + 5],
+            notes[3 * 12 + 7],
+            notes[3 * 12 + 9],
+            notes[3 * 12 + 11],
+            notes[4 * 12 + 0],
+            notes[4 * 12 + 2],
+            notes[4 * 12 + 4],
+            notes[4 * 12 + 5],
+            notes[4 * 12 + 7],
+            notes[4 * 12 + 9],
+            notes[4 * 12 + 11],
+        ];
+        song_chords.append(&mut barka.into_iter().map(|v| vec![scale[v]]).collect());
 
-        10, 10, 10,
-        10, 10, 10,
-        10, 10, 10,
-        10, 10, 9,
-        8, 8, 8,
-        8, 8, 8,
-        8, 8, 4,
-        7, 7, 8,
+        let note_length = 0.3 * SAMPLE_RATE as f32;
+        let song = song_chords.into_iter().map(chord).fold(
+            Box::new(std::iter::empty::<f32>()) as _,
+            |song: Box<dyn Iterator<Item = f32>>, chunk| {
+                Box::new(song.chain(chunk.take(note_length as usize)))
+                // 2 seconds of each chord
+            },
+        );
 
-        9, 9, 9,
-        9, 9, 9,
-        9, 9, 9,
-        10, 10, 8,
-        7, 7, 7,
-        7, 7, 7,
-        7, 7, 7,
-        7, 7, 7,
+        song.map(|sample| sample as i16).collect()
+    }
 
-        12, 12, 12,
-        12, 12, 12,
-        12, 12, 13,
-        14, 13, 12,
-        11, 11, 11,
-        11, 11, 11,
-        11, 11, 11,
-        10, 10, 9,
-
-        10, 10, 10,
-        10, 10, 10,
-        10, 10, 11,
-        12, 11, 10,
-        9, 9, 9,
-        9, 9, 9,
-        9, 9, 9,
-        7, 7, 7,
-
-        12, 12, 12,
-        12, 12, 12,
-        12, 12, 13,
-        14, 13, 12,
-        11, 11, 11,
-        9, 9, 9,
-        9, 9, 9,
-        10, 10, 9,
-
-        10, 10, 10,
-        10, 10, 10,
-        10, 8, 9,
-        10, 9, 8,
-        7, 7, 7,
-        7, 7, 7,
-        7, 7, 7,
-        7, 7, 7,
-    ];
-    song_chords.append(
-        &mut barka
-            .into_iter()
-            .map(|v| vec![scale[v], scale[v + 2], scale[v + 4], scale[v + 7], scale[v + 9], scale[v + 14]])
-            .collect(),
-    );
-
-    let note_length = 0.15 * SAMPLE_RATE as f32;
-    let song = song_chords.into_iter().map(chord).fold(
-        Box::new(std::iter::empty::<f32>()) as _,
-        |song: Box<dyn Iterator<Item = f32>>, chunk| {
-            Box::new(
-                song.chain(chunk.take(note_length as usize)),
-            )
-            // 2 seconds of each chord
-        },
-    );
     println!("2 :: generating pythagorean chords");
     let spec = hound::WavSpec {
-        channels: 1, // mono
+        channels: 2, // mono
         sample_rate: SAMPLE_RATE,
         bits_per_sample: 16,
         sample_format: hound::SampleFormat::Int,
     };
     let mut writer = hound::WavWriter::create("./output/pythagorean_chords.wav", spec)?;
-    for sample in song {
-        writer.write_sample(sample as i16)?;
+    let barka_pythagorean = make_barka(pythagorean::notes());
+    let barka_tempered = make_barka(equal_temperament::notes());
+
+    for (pythagorean, equal) in barka_pythagorean
+        .into_iter()
+        .zip(barka_tempered.into_iter())
+    {
+        writer.write_sample(pythagorean)?;
+        writer.write_sample(equal)?;
     }
     Ok(())
 }
