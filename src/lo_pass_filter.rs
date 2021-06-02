@@ -1,10 +1,10 @@
 use hound::{WavReader, WavWriter};
-use itertools::Itertools;
+use itertools::{Itertools, Tee};
 use ringbuf::{Consumer, Producer, RingBuffer};
-use itertools::Itertools;
 
 const INPUT_FILE: &str = "./data/audio-input.wav";
-const OUTPUT_FILE: &str = "./output/after-lo-pass.wav";
+const OUTPUT_FILE_LO_PASS: &str = "./output/after-lo-pass.wav";
+const OUTPUT_FILE_HI_PASS: &str = "./output/after-hi-pass.wav";
 
 const I24_MAX: i32 = (1 << 23) - 1;
 const I24_MIN: i32 = -I24_MAX;
@@ -15,22 +15,22 @@ pub trait SignalFilter<T: Iterator<Item = i32>>: Sized + Iterator<Item = i32> {
 }
 
 struct HiPassFilter<T: Iterator<Item = i32>> {
-    lo_pass: LoPassFilter<T>,
-    dry: T,
+    lo_pass: LoPassFilter<Tee<T>>,
+    dry: Tee<T>,
 }
 
 impl<T: Iterator<Item = i32>> Iterator for HiPassFilter<T> {
     type Item = i32;
 
     fn next(&mut self) -> Option<Self::Item> {
-        self.lo_pass.next()
+        Some(self.dry.next()? - self.lo_pass.next()?)
     }
 }
 
 impl<T: Iterator<Item = i32>> SignalFilter<T> for HiPassFilter<T> {
     fn new(input: T, width: i32) -> Self {
         let (one, two) = input.tee();
-        let lo_pass = LoPassFilter::new(one.into_iter(), width);
+        let lo_pass = LoPassFilter::new(one, width);
         Self {
             lo_pass,
             dry: two,
@@ -81,8 +81,8 @@ impl<T: Iterator<Item = i32>> Iterator for LoPassFilter<T> {
 }
 
 pub fn run() -> Result<(), Box<dyn std::error::Error>> {
-    let mut reader = hound::WavReader::open(INPUT_FILE)?;
     println!("3 :: applying a lo pass filter");
+    let mut reader = hound::WavReader::open(INPUT_FILE)?;
     let spec = reader.spec();
     println!("{:#?}", spec);
     let samples = reader.samples::<i32>().collect::<Result<Vec<i32>, _>>()?;
@@ -91,10 +91,27 @@ pub fn run() -> Result<(), Box<dyn std::error::Error>> {
     let left_filter = LoPassFilter::new(left.into_iter(), 2);
     let right_filter = LoPassFilter::new(right.into_iter(), 2);
 
-    let mut writer = hound::WavWriter::create(OUTPUT_FILE, spec)?;
+    let mut writer = hound::WavWriter::create(OUTPUT_FILE_LO_PASS, spec)?;
     for (l, r) in  left_filter.into_iter().zip(right_filter.into_iter()) {
-        writer.write_sample(one_minus(l) / 1000)?;
-        writer.write_sample(one_minus(l) / 1000)?;
+        writer.write_sample(l)?;
+        writer.write_sample(l)?;
     }
+
+    println!("4 :: applying a hi pass filter");
+    let mut reader = hound::WavReader::open(INPUT_FILE)?;
+    let spec = reader.spec();
+    println!("{:#?}", spec);
+    let samples = reader.samples::<i32>().collect::<Result<Vec<i32>, _>>()?;
+    let left = samples.iter().enumerate().filter(|(index, _value)| index % 2 == 0).map(|(_i, v)| *v).collect::<Vec<_>>();
+    let right = samples.iter().enumerate().filter(|(index, _value)| index % 2 == 1).map(|(_i, v)| *v).collect::<Vec<_>>();
+    let left_filter = HiPassFilter::new(left.into_iter(), 2);
+    let right_filter = HiPassFilter::new(right.into_iter(), 2);
+
+    let mut writer = hound::WavWriter::create(OUTPUT_FILE_HI_PASS, spec)?;
+    for (l, r) in  left_filter.into_iter().zip(right_filter.into_iter()) {
+        writer.write_sample(l)?;
+        writer.write_sample(l)?;
+    }
+
     Ok(())
 }
