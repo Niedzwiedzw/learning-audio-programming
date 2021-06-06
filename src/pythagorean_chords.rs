@@ -1,12 +1,12 @@
 use hound; // WAV codec library
 use itertools::Itertools;
 
-const SAMPLE_RATE: u32 = 44100; // 44100 signal samples per second
-const AMPLITUDE: f32 = std::i16::MAX as f32 * 0.6; // to avoid distortion
+pub const SAMPLE_RATE: u32 = 44100; // 44100 signal samples per second
+pub const AMPLITUDE: f32 = std::i16::MAX as f32 * 0.6; // to avoid distortion
 
 const A4: f32 = 440.0;
 
-fn sine_wave(freq: f32) -> impl Iterator<Item = f32> {
+pub fn sine_wave(freq: f32) -> impl Iterator<Item = f32> {
     Box::new(
         std::iter::repeat(())
             .enumerate()

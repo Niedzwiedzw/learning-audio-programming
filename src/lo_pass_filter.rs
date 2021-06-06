@@ -2,7 +2,7 @@ use hound::{WavReader, WavWriter};
 use itertools::{Itertools, Tee};
 use ringbuf::{Consumer, Producer, RingBuffer};
 
-const INPUT_FILE: &str = "./data/audio-input.wav";
+pub const INPUT_FILE: &str = "./data/audio-input.wav";
 const OUTPUT_FILE_LO_PASS: &str = "./output/after-lo-pass.wav";
 const OUTPUT_FILE_HI_PASS: &str = "./output/after-hi-pass.wav";
 
@@ -38,7 +38,7 @@ impl<T: Iterator<Item = i32>> SignalFilter<T> for HiPassFilter<T> {
     }
 }
 
-struct LoPassFilter<T: Iterator<Item = i32>> {
+pub struct LoPassFilter<T: Iterator<Item = i32>> {
     pub input: T,
     previous: i32,
     width: i32,
@@ -80,7 +80,8 @@ impl<T: Iterator<Item = i32>> Iterator for LoPassFilter<T> {
     }
 }
 
-pub fn run() -> Result<(), Box<dyn std::error::Error>> {
+pub fn run() -> Result<(), Box<dyn std::error::Error
+                               >> {
     println!("3 :: applying a lo pass filter");
     let mut reader = hound::WavReader::open(INPUT_FILE)?;
     let spec = reader.spec();

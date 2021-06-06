@@ -8,4 +8,11 @@ edition = "2018"
 [dependencies]
 hound = "3.4.0"
 itertools = "0.10.0"
+plotters = "0.3.1"
+rand = "0.8.3"
+rand_distr = "0.4.0"
+rand_xorshift = "0.3.0"
+rayon = "1.5.1"
 ringbuf = "0.2.5"
+rustfft = "6.0.1"
+uuid = {version = "0.8.2", features=["v4"]}
